@@ -1,8 +1,8 @@
-# Authjs (Google and Gighub Provider) ([doc](https://authjs.dev/))
+# Authjs (Adding credential login) ([doc](https://authjs.dev/))
 
-A simple app where you will find two button, one for google login and another for github login. After login user will be redirected to the home page. where the user can see user name, image and a logout button. Logout using the logout button. Thats it. Everything is done in server side using server action.
+A simple app where in the home page user will find a form to login with email and password or use google or github  to login. If user login with google or github, user will be redirected to the home page. where the user can see user name, image and a logout button. if user used credetial to login(email, password) then they will see only thier name and logout button. As no database is use to store user info, and no signup form, we use a 'user.js' file with an array containing some users info like email and password to Mimic a database of singup users. So, only the users in this array can login. User can Logout using the logout button. Thats it. 
 
-Here anyone can login and logout. No database is used to store user info. AuthJS uses cookie to handle session.
+we have to make the form as client component to show the user credential mistake error like wrong password, email not found etc.
 
 ## env variables
 - GOOGLE_CLIENT_ID

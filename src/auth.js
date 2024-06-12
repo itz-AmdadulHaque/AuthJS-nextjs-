@@ -1,11 +1,45 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
-
+import CredentialsProvider from "next-auth/providers/credentials";
+import { getUserByEmail } from "./data/users";
 // here auth gives us the session with info form google or github
 // add this handler to [...nextauth]/route.ts to get {get, post} method
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  session: {  // for credentials provider
+    strategy: "jwt",
+  },
   providers: [
+    CredentialsProvider({
+      credentials: {
+        email: {},
+        password: {},
+      },
+      // this functionis for applying logic for credential provider
+      //it recives the credential info which is given in singIn() method
+      async authorize(credentials) {
+        if (credentials === null) return null;
+
+        try {
+          const user = getUserByEmail(credentials?.email);
+          console.log(user);
+          if (user) {
+            const isMatch = user?.password === credentials.password;
+
+            if (isMatch) {
+              return user;
+            } else {
+              throw new Error("Email or Password is not correct");
+            }
+          } else {
+            throw new Error("User not found");
+          }
+        } catch (error) {
+          throw new Error(error);
+        }
+      },
+    }),
+
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
@@ -19,19 +53,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         },
       },
     }),
+
     GitHubProvider({
-        clientId: process.env.GITHUB_CLIENT_ID,
-        clientSecret: process.env.GITHUB_CLIENT_SECRET,
-  
-        // (optional) use this, if you are not storing the login info in db for persistance login
-        authorization: {
-          params: {
-            prompt: "consent",
-            access_type: "offline",
-            response_type: "code",
-          },
+      clientId: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+
+      // (optional) use this, if you are not storing the login info in db for persistance login
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code",
         },
-      }),
+      },
+    }),
   ],
 });
 

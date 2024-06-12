@@ -1,16 +1,64 @@
-import { doSocialLogin } from "@/app/actions";
+"use client";
+
+import SocialLogins from "./SocialLogins";
+
+import { doCredentialLogin } from "@/app/actions";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+
 
 const LoginForm = () => {
-    return (
-        <form action={doSocialLogin}>
-            <button className="bg-pink-400 text-white p-1 rounded-md m-1 text-lg" type="submit" name="action" value="google">
-                Sign In With Google
-            </button>
+    const router = useRouter();
+    const [error, setError] = useState("");
 
-            <button className="bg-black text-white p-1 rounded-md m-1 text-lg" type="submit" name="action" value="github">
-                Sign In With GitHub
-            </button>
-        </form>
+    // this is not a server action so it wont recive formdata like server action does
+    async function onSubmit(event) {
+        event.preventDefault();
+        try {
+            const formData = new FormData(event.currentTarget);
+
+            const response = await doCredentialLogin(formData);
+
+            // this is only work if you send a error response
+            // here we don't sent any, only thow error in authjs credentials login logic,
+            // so, every error will handle by catch part
+            if (!!response.error) {
+                console.error(response.error);
+                setError(response.error.message);
+            } else {
+                router.push("/home");
+            }
+        } catch (e) {
+            console.error(e);
+            setError("Check your Credentials");
+        }
+    }
+
+
+    return (
+        <>
+            <div className="text-xl text-red-500">{error}</div>
+            <form 
+                className="my-5 flex flex-col items-center border p-3 border-gray-200 rounded-md"
+                onSubmit={onSubmit}
+                >
+                <div className="my-2">
+                    <label htmlFor="email">Email Address</label>
+                    <input className="border mx-2 border-gray-500 rounded" type="email" name="email" id="email" />
+                </div>
+
+                <div className="my-2">
+                    <label htmlFor="password">Password</label>
+                    <input className="border mx-2 border-gray-500 rounded" type="password" name="password" id="password" />
+                </div>
+
+                <button type="submit" className="bg-orange-300 mt-4 rounded flex justify-center items-center w-36">
+                    Ceredential Login
+                </button>
+            </form>
+            <SocialLogins />
+        </>
     );
 };
 
