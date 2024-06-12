@@ -1,3 +1,16 @@
+# Authjs (Google and Gighub Provider) ([doc](https://authjs.dev/))
+
+A simple app where you will find two button, one for google login and another for github login. After login user will be redirected to the home page. where the user can see user name, image and a logout button. Logout using the logout button. Thats it. Everything is done in server side using server action.
+
+Here anyone can login and logout. No database is used to store user info. AuthJS uses cookie to handle session.
+
+## env variables
+- GOOGLE_CLIENT_ID
+- GOOGLE_CLIENT_SECRET
+- AUTH_SECRET 
+- GITHUB_CLIENT_ID
+- GITHUB_CLIENT_SECRET
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
