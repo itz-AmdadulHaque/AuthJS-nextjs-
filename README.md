@@ -1,8 +1,10 @@
 # Authjs (Adding credential login) ([doc](https://authjs.dev/))
 
-A simple app where in the home page user will find a form to login with email and password or use google or github  to login. If user login with google or github, user will be redirected to the home page. where the user can see user name, image and a logout button. if user used credetial to login(email, password) then they will see only thier name and logout button. As no database is use to store user info, and no signup form, we use a 'user.js' file with an array containing some users info like email and password to Mimic a database of singup users. So, only the users in this array can login. User can Logout using the logout button. Thats it. 
+A simple app where in the home page user will find a form to login with email and password or use google or github  to login. If user login with google or github, user will be redirected to the home page. where the user can see user name, image and a logout button. if user used credetial to login(email, password) then they will see only thier name and logout button. we added a register page, where user can register using credentials(email, password). 
 
-we have to make the form as client component to show the user credential mistake error like wrong password, email not found etc.
+We store the user info in mongodb database when they register using credetials(email, password). we did not store the user info when they login with OAuth like google or github. we will do it later.  Now only the user who is register with credentials(email, password) can login. Again user can login with google or github as we did handle storing OAuth registration in db  yet.
+
+we made a register route to handle register and updated authjs.
 
 ## env variables
 - GOOGLE_CLIENT_ID

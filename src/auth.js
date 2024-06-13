@@ -2,11 +2,15 @@ import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { getUserByEmail } from "./data/users";
+
+import { User } from "./model/user-model";
+import bcrypt from "bcryptjs";
+import { dbConnect } from "./lib/dbConnect";
 // here auth gives us the session with info form google or github
 // add this handler to [...nextauth]/route.ts to get {get, post} method
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  session: {  // for credentials provider
+  session: {
+    // for credentials provider
     strategy: "jwt",
   },
   providers: [
@@ -18,13 +22,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       // this functionis for applying logic for credential provider
       //it recives the credential info which is given in singIn() method
       async authorize(credentials) {
+        await dbConnect();
         if (credentials === null) return null;
 
         try {
-          const user = getUserByEmail(credentials?.email);
+          const user = await User.findOne({
+            email: credentials?.email,
+          });
           console.log(user);
+
           if (user) {
-            const isMatch = user?.password === credentials.password;
+            const isMatch = await bcrypt.compare(
+              credentials.password,
+              user.password
+            );
 
             if (isMatch) {
               return user;
