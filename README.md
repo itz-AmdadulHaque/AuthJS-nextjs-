@@ -1,10 +1,23 @@
 # Authjs (Adding credential login) ([doc](https://authjs.dev/))
 
-A simple app where in the home page user will find a form to login with email and password or use google or github  to login. If user login with google or github, user will be redirected to the home page. where the user can see user name, image and a logout button. if user used credetial to login(email, password) then they will see only thier name and logout button. we added a register page, where user can register using credentials(email, password). 
+A simple app to learn Authjs. Root page("/") has a navbar with login option, and  a link to visit 'products' page. User can see the products page and product detail page, but to buy (checkout page) user must have to login. When user login they will see thier image icon on navbar which is a link to visit dashbaord page, user also need to be login to see this page. User can logout using logout button, shown in the navbar after login. User can also register if not have an acount.
 
-We store the user info in mongodb database when they register using credetials(email, password). we did not store the user info when they login with OAuth like google or github. we will do it later.  Now only the user who is register with credentials(email, password) can login. Again user can login with google or github as we did handle storing OAuth registration in db  yet.
+Backend api consist of 'register' route and 'me' route. 'me' route return user info and only be access after login.
 
-we made a register route to handle register and updated authjs.
+We store the user info in mongodb database when they register using credetials(email, password). we did not store the user info when they login with OAuth like google or github. we will do it later.  Now only the user who is register with credentials(email, password) can login. 
+
+## Authentication and Authorization
+### Frontend
+- we use middleware to apply authentication in the frontend using Authjs.
+### Backend api
+- we check the session using Authjs in every route, if the user is login or not. (did not use any middleware)
+- we made a register route to handle registering user. (does not need to login access this route)
+
+## packages
+- Authjs
+- lucide-react -> for icons
+- mongoose
+- bcryptjs
 
 ## env variables
 - GOOGLE_CLIENT_ID

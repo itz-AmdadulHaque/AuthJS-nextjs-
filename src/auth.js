@@ -5,14 +5,13 @@ import CredentialsProvider from "next-auth/providers/credentials";
 
 import { User } from "./model/user-model";
 import bcrypt from "bcryptjs";
+import { authConfig } from "./auth.config";
+
 import { dbConnect } from "./lib/dbConnect";
 // here auth gives us the session with info form google or github
 // add this handler to [...nextauth]/route.ts to get {get, post} method
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  session: {
-    // for credentials provider
-    strategy: "jwt",
-  },
+  ...authConfig,
   providers: [
     CredentialsProvider({
       credentials: {
