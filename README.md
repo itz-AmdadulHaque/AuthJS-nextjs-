@@ -20,9 +20,12 @@ We store the user info in mongodb database when they register using credetials(e
 - we made a register route to handle registering user. (does not need to login access this route)
 
 ### Problem
-Everything is fine working in dev mode, but when we try to build we get error, as we are using auth from 'auth.js' which using mongodb connection and middleware don't support this, due to edge runtime.
+- Everything is fine working in dev mode, but when we try to build we get error, as we are using auth from 'auth.js' which using mongodb connection and middleware don't support this, due to edge runtime.
 
-Again if we use separated auth from 'auth.config.js' to get the auth session in middleware, then the problem solve. but we are not gettting the role in the session in middleware.
+- Again if we use separated auth from 'auth.config.js' to get the auth session in middleware, then the problem solve. but we are not gettting the role in the session in middleware.
+
+### solve
+If we don't use middleware then we can use the auth() to check session in every route in frontend or in backend, its work fine, but here we try to add the middleware and way to solve it.
 
 ## packages
 
