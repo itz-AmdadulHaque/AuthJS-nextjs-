@@ -1,12 +1,14 @@
 # Authjs (Adding credential login) ([doc](https://authjs.dev/))
 
-A simple app to learn Authjs. Root page("/") has a navbar with login option, and a link to visit 'products' page. User can see the products page and product detail page, but to buy (checkout page) user must have to login. When user login they will see thier image icon on navbar which is a link to visit dashbaord page, user also need to be login to see this page. User can logout using logout button, shown in the navbar after login. User can also register if not have an acount.
+A simple app to learn Authjs. Every page has the common layout with a navbar in the top. In the navbar, User will see login button if they did not logged in yet. If they logged in they will see a Dashbaord, Admin, image icon and a logout button. When user login with OAuth like google they will see a image return from google, if they login with credentials(email, password), they will see the image icon. 
 
-Backend api consist of 'register' route and 'me' route. 'me' route return user info and only be access after login. If you login with google or github we will see a null return from 'me' route, as the Oauth is not register in db.
+Root page("/") has a link to visit 'products' page. User can see the products page and product detail page, but to buy (checkout page) user must have to login.
 
-We store the user info in mongodb database when they register using credetials(email, password). we did not store the user info when they login with OAuth like google or github. we will do it later. Now only the user who is register with credentials(email, password) can login.
+'/home', '/dashboard', '/admin' these page are protected pages, user must have to login if they want to visit these pages. Again only Admin can visit the '/admin' page.
 
-## Authentication and Authorization
+Backend api consist of 'register' route and 'me' route. 'me' route return user info and only be access after login. By default we have given every user the role as 'user'. If you want to make any user 'Admin' you have to do it manually in the database.
+
+We store the user info in mongodb database when they register using credetials(email, password). When user login with OAuth like google or github, if the user logging for the first time, we store the user in the database.
 
 ### Frontend
 
@@ -16,6 +18,11 @@ We store the user info in mongodb database when they register using credetials(e
 
 - we check the session using Authjs in every route, if the user is login or not. (did not use any middleware)
 - we made a register route to handle registering user. (does not need to login access this route)
+
+### Problem
+Everything is fine working in dev mode, but when we try to build we get error, as we are using auth from 'auth.js' which using mongodb connection and middleware don't support this, due to edge runtime.
+
+Again if we use separated auth from 'auth.config.js' to get the auth session in middleware, then the problem solve. but we are not gettting the role in the session in middleware.
 
 ## packages
 

@@ -8,7 +8,7 @@ import { CircleUserRound } from "lucide-react";
 const Navbar = async () => {
   const session = await auth();
   const loggedInUser = session?.user;
-  //console.log(loggedInUser);
+  console.log("///////Navbar: ", loggedInUser);
   const userName = loggedInUser?.name;
 
   return (
@@ -17,10 +17,16 @@ const Navbar = async () => {
         <h1 className="text-2xl">Product App</h1>
       </Link>
       <nav>
-        <ul className="flex pt-1">
+        <ul className="flex gap-2 items-center pt-1">
           {userName ? (
-            <li className="flex">
-              <Link href="/dashboard">
+            <>
+              <li>
+                <Link href="/dashboard">Dashboard</Link>
+              </li>
+              <li>
+                <Link href="/admin">Admin</Link>
+              </li>
+              <li className="flex items-center gap-2">
                 {session?.user?.image ? (
                   <Image
                     src={session?.user?.image}
@@ -32,10 +38,9 @@ const Navbar = async () => {
                 ) : (
                   <CircleUserRound />
                 )}
-              </Link>
-              <span className="mx-1">|</span>
-              <Logout />
-            </li>
+                <Logout />
+              </li>
+            </>
           ) : (
             <>
               <li className="mx-2">

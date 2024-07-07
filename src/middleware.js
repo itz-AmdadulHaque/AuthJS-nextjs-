@@ -1,6 +1,7 @@
-import { NextResponse } from "next/server";
+import {PUBLIC_ROUTES, LOGIN, ROOT, PROTECTED_SUB_ROUTES} from "@/lib/routes";
 import { authConfig } from "./auth.config";
 import NextAuth from "next-auth";
+import { auth } from "./auth";
 
 // /*
 // In Next.js, middleware executes before your application components and
@@ -10,20 +11,28 @@ import NextAuth from "next-auth";
 // */
 
 // using the separated auth to avoid the error
-const {auth} = NextAuth(authConfig)
-
-import {PUBLIC_ROUTES, LOGIN, ROOT, PROTECTED_SUB_ROUTES} from "@/lib/routes";
+// const {auth} = NextAuth(authConfig)
 
 export async function middleware(request) {
+  console.log("///////////////midleware//////")
   const { nextUrl } = request;
   const session = await auth();
   const isAuthenticated = !!session?.user;
-  console.log(isAuthenticated, nextUrl.pathname);
+
+  
+  
+  console.log("/////session: ", session?.user)
+  console.log("///role: ", session?.user?.role)
+  console.log("///auth: ",isAuthenticated, "   ///Url: ", nextUrl.pathname);
 
   const isPublicRoute = ((PUBLIC_ROUTES.find(route => nextUrl.pathname.startsWith(route))
   || nextUrl.pathname === ROOT) && !PROTECTED_SUB_ROUTES.find(route => nextUrl.pathname.includes(route)));
 
-  console.log(isPublicRoute);
+  console.log("////public route: ",isPublicRoute);
+
+  if (isAuthenticated && nextUrl.pathname === '/admin' && session?.user?.role !== "Admin"){
+    return Response.redirect(new URL('/unauthorize', nextUrl));
+  }
 
   if (!isAuthenticated && !isPublicRoute)
     return Response.redirect(new URL(LOGIN, nextUrl));

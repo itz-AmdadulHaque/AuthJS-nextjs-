@@ -29,8 +29,9 @@ const RegistrationForm = () => {
             password
           })
         });
+        console.log("////response: ", response)
 
-        response.status === 201 && router.push('/');
+        response.status === 201 && router.push('/login');
         
 
       } catch (e) {

@@ -2,12 +2,11 @@ import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
-
 import { User } from "./model/user-model";
 import bcrypt from "bcryptjs";
+import { dbConnect } from "./lib/dbConnect";
 import { authConfig } from "./auth.config";
 
-import { dbConnect } from "./lib/dbConnect";
 // here auth gives us the session with info form google or github
 // add this handler to [...nextauth]/route.ts to get {get, post} method
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -27,8 +26,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         try {
           const user = await User.findOne({
             email: credentials?.email,
-          });
-          console.log(user);
+          }).select("+password +role"); // won't get them if you don't include them
+          console.log("///user: ", user);
 
           if (user) {
             const isMatch = await bcrypt.compare(
@@ -54,7 +53,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
 
-      // (optional) use this, if you are not storing the login info in db for persistance login
+      // (optional) this gives user a "do you want continue" option
       authorization: {
         params: {
           prompt: "consent",
@@ -78,6 +77,72 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
     }),
   ],
+
+  //authjs give us default singin page in 'api/auth/signin' route.  we don't want user to able to open that page, rather use our custom page
+  // tell auth that, use my custom page for signin, without it user can visit both page but now only to my custom page.
+  pages: {
+    signIn: "/login",
+  },
+
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.role = user.role;
+      }
+      console.log("/////jwt user: ", user);
+      console.log("/////jwt token: ", token);
+      return token;
+    },
+
+    async session({ session, token }) {
+      if (token?.sub && token?.role) {
+        session.user.id = token.sub;
+        session.user.role = token.role;
+      }
+      console.log("///// session token: ", token);
+      console.log("///// session: ", session);
+      return session;
+    },
+
+    signIn: async ({ user, account }) => {
+      console.log("///provider Name: ", account?.provider);
+      console.log("////signing user: ", user);
+
+      if (account?.provider === "google" || account?.provider === "github") {
+        try {
+          const { email, name, image, id } = user; // from google or gihub
+
+          await dbConnect();
+          const alreadyUser = await User.findOne({ email });
+          console.log("/////alreadyUser: ", alreadyUser);
+
+          if (!alreadyUser) {
+            const newUser = await User.create({
+              email,
+              name,
+              image,
+              authProviderId: id,
+            });
+            console.log("////OAuth new user: ", newUser);
+
+            user.role = newUser.role;
+            return true;
+          }
+
+          user.role = alreadyUser.role;
+          return true;
+        } catch (error) {
+          throw new Error("Error while creating user");
+        }
+      }
+
+      if (account?.provider === "credentials") {
+        return true;
+      } else {
+        return false;
+      }
+    },
+  },
 });
 
 // Google
